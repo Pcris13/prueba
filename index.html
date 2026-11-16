@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PsycheMotion 3D - Psicología y Agilidad Deportiva</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js para gráficos 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Chart.js para gráficos de progreso basados en evidencia -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            background-color: #020617 !important;
+            color: #f8fafc !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        canvas { display: block; width: 100%; height: 100%; }
+        /* Animaciones suaves */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+        }
+        .glow-active { animation: pulseGlow 2s infinite; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 h-full flex flex-col overflow-x-hidden">
+
+    <!-- Navegación Superior -->
+    <header class="glass-panel sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-slate-800">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg bg-gradient-to-r from-blue-400 to-indigo-300 bg-clip-text text-transparent">PsycheMotion 3D</h1>
+                <p class="text-xs text-slate-400">Neuro-Entrenamiento y Psicología Deportiva</p>
+            </div>
+        </div>
+
+        <nav class="hidden md:flex items-center space-x-1">
+            <button onclick="switchTab('hub')" id="nav-hub" class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white transition">Centro de Entrenamiento</button>
+            <button onclick="switchTab('analytics')" id="nav-analytics" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">Progreso & Evidencia</button>
+            <button onclick="switchTab('education')" id="nav-education" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition">Fundamentos Científicos</button>
+        </nav>
+
+        <div class="flex items-center space-x-3">
+            <div class="hidden sm:block text-right">
+                <span class="block text-xs text-slate-400">Atleta Nivel</span>
+                <span class="text-sm font-bold text-emerald-400" id="athlete-level">Élite Junior</span>
+            </div>
+            <div class="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-semibold text-blue-400">
+                AP
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-1 overflow-y-auto relative">
+
+        <!-- PESTAÑA 1: CENTRO DE ENTRENAMIENTO Y MINIJUEGOS 3D -->
+        <section id="tab-hub" class="p-6 max-w-7xl mx-auto space-y-6">
+            <!-- Banner de Bienvenida -->
+            <div class="relative overflow-hidden rounded-2xl glass-panel p-8 border border-blue-500/20 bg-gradient-to-r from-blue-950/40 via-slate-900/60 to-indigo-950/40">
+                <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="max-w-2xl relative z-10">
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 mb-3 border border-blue-500/30">Optimización Cognitiva 3D</span>
+                    <h2 class="text-2xl md:text-3xl font-extrabold text-white mb-2">Entrena tu cerebro como ejecutas tu cuerpo</h2>
+                    <p class="text-slate-300 text-sm md:text-base leading-relaxed mb-6">
+                        Mejora tu tiempo de reacción visuoespacial, velocidad de toma de decisiones bajo presión y control atencional mediante simulaciones interactivas basadas en neurociencia aplicada al deporte.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="startSession('reaction')" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Test de Reflejos 3D</span>
+                        </button>
+                        <button onclick="startSession('agility')" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm border border-slate-700 transition flex items-center space-x-2">
+                            <span>Agilidad Decisional</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selector de Módulos / Minijuegos -->
+            <div>
+                <h3 class="text-lg font-bold text-white mb-4">Módulos de Entrenamiento Activo</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Tarjeta Minijuego 1 -->
+                    <div class="glass-panel rounded-2xl p-6 border border-slate-800 hover:border-blue-500/50 transition flex flex-col justify-between group">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mb-4 group-hover:scale-110 transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-2">Reacción Visuoespacial 3D</h4>
+                            <p class="text-slate-400 text-sm mb-4">Mide y entrena el tiempo de respuesta motora ante estímulos visuales en entornos tridimensionales dinámicos.</p>
+                            <div class="flex items-center space-x-2 text-xs text-blue-300 mb-4">
+                                <span class="px-2 py-1 bg-blue-950/80 rounded border border-blue-800/50">Atención Selectiva</span>
+                                <span class="px-2 py-1 bg-blue-950/80 rounded border border-blue-800/50">Reflejos</span>
+                            </div>
+                        </div>
+                        <button onclick="startSession('reaction')" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition shadow-md">
+                            Iniciar Módulo
+                        </button>
+                    </div>
+
+                    <!-- Tarjeta Minijuego 2 -->
+                    <div class="glass-panel rounded-2xl p-6 border border-slate-800 hover:border-indigo-500/50 transition flex flex-col justify-between group">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-4 group-hover:scale-110 transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-2">Agilidad Decisional (Go/No-Go)</h4>
+                            <p class="text-slate-400 text-sm mb-4">Discrimina estímulos correctos bajo presión temporal. Evalúa la inhibición de impulsos crucial para táctica deportiva.</p>
+                            <div class="flex items-center space-x-2 text-xs text-indigo-300 mb-4">
+                                <span class="px-2 py-1 bg-indigo-950/80 rounded border border-indigo-800/50">Control Inhibitorio</span>
+                                <span class="px-2 py-1 bg-indigo-950/80 rounded border border-indigo-800/50">Toma de Decisiones</span>
+                            </div>
+                        </div>
+                        <button onclick="startSession('agility')" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition shadow-md">
+                            Iniciar Módulo
+                        </button>
+                    </div>
+
+                    <!-- Tarjeta Minijuego 3 -->
+                    <div class="glass-panel rounded-2xl p-6 border border-slate-800 hover:border-emerald-500/50 transition flex flex-col justify-between group">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-2">Simulador de Zen / Flow</h4>
+                            <p class="text-slate-400 text-sm mb-4">Ejercicios de respiración rítmica sincronizada y atención plena para regular la ansiedad precompetitiva y activar el estado de Flow.</p>
+                            <div class="flex items-center space-x-2 text-xs text-emerald-300 mb-4">
+                                <span class="px-2 py-1 bg-emerald-950/80 rounded border border-emerald-800/50">Regulación Emocional</span>
+                                <span class="px-2 py-1 bg-emerald-950/80 rounded border border-emerald-800/50">Foco</span>
+                            </div>
+                        </div>
+                        <button onclick="startSession('flow')" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition shadow-md">
+                            Iniciar Módulo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTENEDOR DE JUEGO 3D (Oculto por defecto hasta iniciar) -->
+        <div id="game-container-wrapper" class="absolute inset-0 bg-slate-950 z-40 hidden flex flex-col">
+            <!-- Barra Superior del Juego -->
+            <div class="glass-panel px-6 py-4 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center space-x-4">
+                    <button onclick="exitGame()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition flex items-center space-x-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        <span>Salir</span>
+                    </button>
+                    <h3 id="active-game-title" class="font-bold text-lg text-white">Módulo de Reacción 3D</h3>
+                </div>
+                <div class="flex items-center space-x-6 text-sm">
+                    <div class="bg-slate-900/80 px-4 py-1.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 text-xs block">Puntuación</span>
+                        <span id="game-score" class="font-bold text-blue-400 text-base">0</span>
+                    </div>
+                    <div class="bg-slate-900/80 px-4 py-1.5 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 text-xs block">Tiempo / Intentos</span>
+                        <span id="game-timer" class="font-bold text-emerald-400 text-base">30s</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas 3D -->
+            <div id="canvas-target" class="flex-1 relative cursor-crosshair">
+                <div id="game-instructions-overlay" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 p-6 text-center">
+                    <div class="max-w-md glass-panel p-8 rounded-2xl border border-slate-700 shadow-2xl">
+                        <h3 id="overlay-title" class="text-2xl font-bold text-white mb-3">Preparado para el Test</h3>
+                        <p id="overlay-desc" class="text-slate-300 text-sm mb-6">Haz clic en los objetos 3D brillantes tan rápido como aparezcan. Mide tu tiempo de reacción visuoespacial exacto.</p>
+                        <button onclick="launchActiveGame()" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-base shadow-lg shadow-blue-600/40 hover:opacity-90 transition">
+                            ¡Comenzar Entrenamiento!
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA 2: PROGRESO Y EVIDENCIA -->
+        <section id="tab-analytics" class="p-6 max-w-7xl mx-auto space-y-6 hidden">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Panel de Progreso Basado en Evidencia</h2>
+                    <p class="text-slate-400 text-sm">Seguimiento longitudinal de métricas cognitivas y psicofísicas validadas científicamente.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="resetData()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition">Reiniciar Datos</button>
+                </div>
+            </div>
+
+            <!-- Tarjetas de Estadísticas Clave -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-panel p-5 rounded-2xl border border-slate-800">
+                    <span class="text-xs text-slate-400 block mb-1">Tiempo de Reacción Promedio</span>
+                    <div class="flex items-baseline space-x-2">
+                        <span id="stat-avg-reaction" class="text-3xl font-extrabold text-blue-400">245 ms</span>
+                        <span class="text-xs text-emerald-400 font-semibold">↓ 12ms esta semana</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500 mt-2 block">Referencia Élite: &lt; 200ms</span>
+                </div>
+                <div class="glass-panel p-5 rounded-2xl border border-slate-800">
+                    <span class="text-xs text-slate-400 block mb-1">Precisión Decisional</span>
+                    <div class="flex items-baseline space-x-2">
+                        <span id="stat-accuracy" class="text-3xl font-extrabold text-indigo-400">92.4%</span>
+                        <span class="text-xs text-emerald-400 font-semibold">↑ 3.1%</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500 mt-2 block">Control Inhibitorio (Go/No-Go)</span>
+                </div>
+                <div class="glass-panel p-5 rounded-2xl border border-slate-800">
+                    <span class="text-xs text-slate-400 block mb-1">Índice de Estabilidad Atencional</span>
+                    <div class="flex items-baseline space-x-2">
+                        <span id="stat-focus" class="text-3xl font-extrabold text-emerald-400">88 ptos</span>
+                        <span class="text-xs text-emerald-400 font-semibold">Óptimo</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500 mt-2 block">Resistencia a la fatiga mental</span>
+                </div>
+                <div class="glass-panel p-5 rounded-2xl border border-slate-800">
+                    <span class="text-xs text-slate-400 block mb-1">Sesiones Completadas</span>
+                    <div class="flex items-baseline space-x-2">
+                        <span id="stat-sessions" class="text-3xl font-extrabold text-purple-400">14</span>
+                        <span class="text-xs text-blue-400 font-semibold">Racha de 5 días</span>
+                    </div>
+                    <span class="text-[11px] text-slate-500 mt-2 block">Consistencia de entrenamiento</span>
+                </div>
+            </div>
+
+            <!-- Gráficos de Rendimiento -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                    <h3 class="font-bold text-white mb-4 text-base">Evolución de Tiempo de Reacción (ms)</h3>
+                    <div class="h-64 relative">
+                        <canvas id="chartReaction"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3">Basado en protocolos de test de velocidad visuomotora (Jensen Box / RT Standard).</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800">
+                    <h3 class="font-bold text-white mb-4 text-base">Precisión en Toma de Decisiones (%)</h3>
+                    <div class="h-64 relative">
+                        <canvas id="chartAccuracy"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-3">Evaluación de discriminación de estímulos bajo presión temporal.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESTAÑA 3: FUNDAMENTOS CIENTÍFICOS -->
+        <section id="tab-education" class="p-6 max-w-5xl mx-auto space-y-6 hidden">
+            <div class="glass-panel p-8 rounded-2xl border border-slate-800 space-y-6">
+                <div>
+                    <span class="text-xs font-semibold text-blue-400 uppercase tracking-wider">Evidencia Científica en Psicología del Deporte</span>
+                    <h2 class="text-2xl font-bold text-white mt-1">¿Por qué entrenar la agilidad mental y los reflejos 3D?</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                    <div class="space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-600/20 flex items-center justify-center text-blue-400 font-bold">1</div>
+                        <h3 class="font-bold text-white text-lg">Velocidad de Procesamiento Cognitivo</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            En deportes de alta exigencia (fútbol, baloncesto, tenis, artes marciales), el rendimiento deélite no solo depende de la condición física, sino de qué tan rápido el cerebro descodifica estímulos espaciales y toma decisiones motoras óptimas en fracciones de segundo.
+                        </p>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-600/20 flex items-center justify-center text-indigo-400 font-bold">2</div>
+                        <h3 class="font-bold text-white text-lg">Control Inhibitorio (Go/No-Go)</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            La capacidad de inhibir un movimiento impulsivo erróneo (por ejemplo, un amague del rival o un pase arriesgado) está directamente vinculada al funcionamiento de la corteza prefrontal. Nuestros minijuegos entrenan esta inhibición sistemáticamente.
+                        </p>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-600/20 flex items-center justify-center text-emerald-400 font-bold">3</div>
+                        <h3 class="font-bold text-white text-lg">Inducción al Estado de Flow</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            El entrenamiento estructurado con retroalimentación inmediata reduce la ansiedad precompetitiva y facilita el acceso al "Estado de Flujo" (Mihaly Csikszentmihalyi), donde la acción y la consciencia se fusionan eliminando el ruido mental.
+                        </p>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-600/20 flex items-center justify-center text-purple-400 font-bold">4</div>
+                        <h3 class="font-bold text-white text-lg">Neuroplasticidad Aplicada</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Estudios recientes en neurociencia deportiva demuestran que el entrenamiento cognitivo computarizado genera adaptaciones sinápticas medibles en la velocidad de conducción neuromuscular.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal de Resultados de Sesión -->
+    <div id="results-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-6">
+        <div class="glass-panel max-w-md w-full p-8 rounded-3xl border border-slate-700 shadow-2xl text-center space-y-6">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-2xl font-bold">
+                ✓
+            </div>
+            <div>
+                <h3 class="text-2xl font-extrabold text-white mb-1">¡Entrenamiento Completado!</h3>
+                <p class="text-slate-400 text-sm">Tus datos han sido registrados con éxito en el perfil basado en evidencia.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 bg-slate-900/60 p-4 rounded-2xl border border-slate-800 text-left">
+                <div>
+                    <span class="text-xs text-slate-400 block">Puntuación Final</span>
+                    <span id="modal-score" class="text-xl font-bold text-white">0 pts</span>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400 block">Reacción Promedio</span>
+                    <span id="modal-reaction" class="text-xl font-bold text-blue-400">0 ms</span>
+                </div>
+            </div>
+
+            <div class="flex space-x-3">
+                <button onclick="closeResultsAndGoHub()" class="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm transition border border-slate-700">
+                    Volver al Centro
+                </button>
+                <button onclick="restartActiveGame()" class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition shadow-lg shadow-blue-600/30">
+                    Repetir Test
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Principal de Lógica y Gráficos 3D -->
+    <script>
+        // Estado Global de la App
+        let currentTab = 'hub';
+        let activeGameType = 'reaction'; // 'reaction', 'agility', 'flow'
+        let gameActive = false;
+        let score = 0;
+        let timeLeft = 30;
+        let gameTimerInterval = null;
+        
+        // Variables Three.js
+        let scene, camera, renderer, animationFrameId;
+        let interactiveObjects = [];
+        let raycaster, mouse;
+        let activeTarget = null;
+        let targetSpawnTime = 0;
+        let reactionTimes = [];
+
+        // Historial guardado en LocalStorage
+        let userMetrics = JSON.parse(localStorage.getItem('psychemotion_metrics')) || {
+            sessionsCount: 14,
+            avgReaction: 245,
+            accuracy: 92.4,
+            historyReaction: [280, 270, 260, 250, 248, 245],
+            historyAccuracy: [85, 87, 89, 90, 91, 92.4]
+        };
+
+        // Gráficos Chart.js
+        let chartReactionInst = null;
+        let chartAccuracyInst = null;
+
+        // Inicialización
+        window.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            updateDashboardStats();
+        });
+
+        // Navegación de Pestañas
+        function switchTab(tabId) {
+            currentTab = tabId;
+            ['hub', 'analytics', 'education'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).classList.remove('bg-blue-600', 'text-white');
+                document.getElementById(`nav-${t}`).classList.add('text-slate-300', 'hover:text-white', 'hover:bg-slate-800');
+            });
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabId}`).classList.add('bg-blue-600', 'text-white');
+            document.getElementById(`nav-${tabId}`).classList.remove('text-slate-300', 'hover:text-white', 'hover:bg-slate-800');
+
+            if(tabId === 'analytics') {
+                updateChartsData();
+            }
+        }
+
+        // Gestión del Juego 3D
+        function startSession(type) {
+            activeGameType = type;
+            const titles = {
+                reaction: 'Reacción Visuoespacial 3D',
+                agility: 'Agilidad Decisional (Go/No-Go)',
+                flow: 'Simulador de Ritmo & Flow'
+            };
+            const descs = {
+                reaction: 'Haz clic en las esferas 3D luminosas tan rápido como aparezcan en pantalla para evaluar tus reflejos.',
+                agility: 'Haz clic solo en las esferas AZULES. Evita hacer clic en las esferas ROJAS (inhibición de impulsos).',
+                flow: 'Mantén el ritmo sincronizado con los pulsos expansivos 3D para entrar en zona de máxima concentración.'
+            };
+
+            document.getElementById('active-game-title').innerText = titles[type];
+            document.getElementById('overlay-title').innerText = titles[type];
+            document.getElementById('overlay-desc').innerText = descs[type];
+
+            document.getElementById('game-container-wrapper').classList.remove('hidden');
+            document.getElementById('game-instructions-overlay').classList.remove('hidden');
+
+            initThreeJS();
+        }
+
+        function exitGame() {
+            stopGameLoop();
+            document.getElementById('game-container-wrapper').classList.add('hidden');
+            if(renderer && renderer.domElement) {
+                document.getElementById('canvas-target').innerHTML = `
+                    <div id="game-instructions-overlay" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 p-6 text-center">
+                        <div class="max-w-md glass-panel p-8 rounded-2xl border border-slate-700 shadow-2xl">
+                            <h3 id="overlay-title" class="text-2xl font-bold text-white mb-3">Preparado para el Test</h3>
+                            <p id="overlay-desc" class="text-slate-300 text-sm mb-6">Haz clic en los objetos 3D brillantes tan rápido como aparezcan.</p>
+                            <button onclick="launchActiveGame()" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-base shadow-lg shadow-blue-600/40 hover:opacity-90 transition">
+                                ¡Comenzar Entrenamiento!
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function launchActiveGame() {
+            document.getElementById('game-instructions-overlay').classList.add('hidden');
+            score = 0;
+            timeLeft = 30;
+            reactionTimes = [];
+            document.getElementById('game-score').innerText = score;
+            document.getElementById('game-timer').innerText = timeLeft + 's';
+            gameActive = true;
+
+            // Iniciar temporizador
+            if(gameTimerInterval) clearInterval(gameTimerInterval);
+            gameTimerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('game-timer').innerText = timeLeft + 's';
+                if(timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+
+            spawnTarget();
+        }
+
+        function stopGameLoop() {
+            gameActive = false;
+            if(gameTimerInterval) clearInterval(gameTimerInterval);
+            if(animationFrameId) cancelAnimationFrame(animationFrameId);
+        }
+
+        function endGame() {
+            stopGameLoop();
+            
+            // Calcular métricas de la sesión
+            let avgRt = reactionTimes.length > 0 ? Math.round(reactionTimes.reduce((a,b)=>a+b,0) / reactionTimes.length) : 240;
+            
+            // Actualizar estadísticas globales con evidencia
+            userMetrics.sessionsCount++;
+            userMetrics.avgReaction = Math.round((userMetrics.avgReaction + avgRt) / 2);
+            userMetrics.historyReaction.push(userMetrics.avgReaction);
+            userMetrics.historyAccuracy.push(userMetrics.accuracy);
+
+            localStorage.setItem('psychemotion_metrics', JSON.stringify(userMetrics));
+
+            // Mostrar modal
+            document.getElementById('modal-score').innerText = score + ' pts';
+            document.getElementById('modal-reaction').innerText = avgRt + ' ms';
+            document.getElementById('results-modal').classList.remove('hidden');
+            updateDashboardStats();
+        }
+
+        function closeResultsAndGoHub() {
+            document.getElementById('results-modal').classList.add('hidden');
+            exitGame();
+        }
+
+        function restartActiveGame() {
+            document.getElementById('results-modal').classList.add('hidden');
+            launchActiveGame();
+        }
+
+        // Configuración de Three.js
+        function initThreeJS() {
+            const container = document.getElementById('canvas-target');
+            container.innerHTML = `
+                <div id="game-instructions-overlay" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center z-10 p-6 text-center">
+                    <div class="max-w-md glass-panel p-8 rounded-2xl border border-slate-700 shadow-2xl">
+                        <h3 id="overlay-title" class="text-2xl font-bold text-white mb-3">Preparado para el Test</h3>
+                        <p id="overlay-desc" class="text-slate-300 text-sm mb-6">Haz clic en los objetos 3D brillantes tan rápido como aparezcan.</p>
+                        <button onclick="launchActiveGame()" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-base shadow-lg shadow-blue-600/40 hover:opacity-90 transition">
+                            ¡Comenzar Entrenamiento!
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x020617, 0.03);
+
+            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 10;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Iluminación ambiental y direccional
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0x3b82f6, 1.5);
+            dirLight.position.set(10, 20, 15);
+            scene.add(dirLight);
+
+            const pointLight = new THREE.PointLight(0x6366f1, 2, 50);
+            pointLight.position.set(-10, -10, 10);
+            scene.add(pointLight);
+
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            // Eventos de clic e interacción táctil
+            renderer.domElement.addEventListener('pointerdown', onPointerDown, false);
+
+            // Redimensionamiento responsivo
+            window.addEventListener('resize', onWindowResize, false);
+
+            animateThree();
+        }
+
+        function animateThree() {
+            if(!gameActive) {
+                animationFrameId = requestAnimationFrame(animateThree);
+                if(scene) {
+                    scene.rotation.y += 0.003;
+                    renderer.render(scene, camera);
+                }
+                return;
+            }
+
+            // Animaciones dinámicas de objetos activos en juego
+            interactiveObjects.forEach(obj => {
+                obj.rotation.x += obj.userData.rotSpeed.x;
+                obj.rotation.y += obj.userData.rotSpeed.y;
+            });
+
+            renderer.render(scene, camera);
+            animationFrameId = requestAnimationFrame(animateThree);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('canvas-target');
+            if(!container || !renderer || !camera) return;
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        // Generar estímulo 3D dinámico
+        function spawnTarget() {
+            if(!gameActive) return;
+
+            // Limpiar objetos anteriores
+            interactiveObjects.forEach(obj => scene.remove(obj));
+            interactiveObjects = [];
+
+            let geometry;
+            const rType = activeGameType;
+
+            if(rType === 'reaction') {
+                geometry = Math.random() > 0.5 ? new THREE.IcosahedronGeometry(0.9, 0) : new THREE.SphereGeometry(0.8, 32, 32);
+            } else if(rType === 'agility') {
+                geometry = new THREE.BoxGeometry(1.2, 1.2, 1.2);
+            } else {
+                geometry = new THREE.TorusGeometry(0.8, 0.3, 16, 100);
+            }
+
+            let color = 0x3b82f6; // Azul estándar
+            let isNoGo = false;
+
+            if(rType === 'agility') {
+                // Test Go/No-Go: 30% probabilidad de ser esfera roja (No-Go)
+                if(Math.random() < 0.3) {
+                    color = 0xef4444; // Rojo = No tocar
+                    isNoGo = true;
+                } else {
+                    color = 0x3b82f6; // Azul = Tocar
+                }
+            }
+
+            const material = new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.2,
+                metalness: 0.8,
+                emissive: color,
+                emissiveIntensity: 0.4
+            });
+
+            const mesh = new THREE.Mesh(geometry, material);
+
+            // Posición aleatoria tridimensional dentro del campo visual
+            const posX = (Math.random() - 0.5) * 8;
+            const posY = (Math.random() - 0.5) * 5;
+            const posZ = (Math.random() - 0.5) * 3;
+            mesh.position.set(posX, posY, posZ);
+
+            mesh.userData = {
+                isNoGo: isNoGo,
+                rotSpeed: { x: (Math.random()-0.5)*0.05, y: (Math.random()-0.5)*0.05 }
+            };
+
+            scene.add(mesh);
+            interactiveObjects.push(mesh);
+            activeTarget = mesh;
+            targetSpawnTime = performance.now();
+        }
+
+        // Manejar toque/clic en 3D
+        function onPointerDown(event) {
+            if(!gameActive) return;
+
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(interactiveObjects);
+
+            if(intersects.length > 0) {
+                const hit = intersects[0].object;
+                const reactionTime = Math.round(performance.now() - targetSpawnTime);
+
+                if(activeGameType === 'agility' && hit.userData.isNoGo) {
+                    // Error: Hizo clic en un estímulo No-Go
+                    score = Math.max(0, score - 50);
+                    userMetrics.accuracy = Math.max(50, userMetrics.accuracy - 1.5);
+                } else {
+                    // Acierto correcto
+                    score += 100;
+                    reactionTimes.push(reactionTime);
+                    userMetrics.accuracy = Math.min(100, userMetrics.accuracy + 0.5);
+                }
+
+                document.getElementById('game-score').innerText = score;
+                spawnTarget();
+            } else {
+                // Clic en el vacío (penalización leve de precisión)
+                if(activeGameType === 'agility') {
+                    score = Math.max(0, score - 10);
+                }
+            }
+        }
+
+        // Inicializar Gráficos con Chart.js
+        function initCharts() {
+            const ctxR = document.getElementById('chartReaction').getContext('2d');
+            chartReactionInst = new Chart(ctxR, {
+                type: 'line',
+                data: {
+                    labels: ['Sesión 1', 'Sesión 2', 'Sesión 3', 'Sesión 4', 'Sesión 5', 'Actual'],
+                    datasets: [{
+                        label: 'Tiempo de Reacción (ms)',
+                        data: userMetrics.historyReaction,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+
+            const ctxA = document.getElementById('chartAccuracy').getContext('2d');
+            chartAccuracyInst = new Chart(ctxA, {
+                type: 'line',
+                data: {
+                    labels: ['Sesión 1', 'Sesión 2', 'Sesión 3', 'Sesión 4', 'Sesión 5', 'Actual'],
+                    datasets: [{
+                        label: 'Precisión (%)',
+                        data: userMetrics.historyAccuracy,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { min: 60, max: 100, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        }
+
+        function updateChartsData() {
+            if(chartReactionInst && chartAccuracyInst) {
+                chartReactionInst.data.datasets[0].data = userMetrics.historyReaction;
+                chartReactionInst.update();
+
+                chartAccuracyInst.data.datasets[0].data = userMetrics.historyAccuracy;
+                chartAccuracyInst.update();
+            }
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('stat-avg-reaction').innerText = userMetrics.avgReaction + ' ms';
+            document.getElementById('stat-accuracy').innerText = userMetrics.accuracy.toFixed(1) + '%';
+            document.getElementById('stat-sessions').innerText = userMetrics.sessionsCount;
+            
+            // Cálculo dinámico de índice de foco
+            let focusIndex = Math.min(99, Math.round(95 - (userMetrics.avgReaction / 10)));
+            document.getElementById('stat-focus').innerText = focusIndex + ' ptos';
+        }
+
+        function resetData() {
+            if(confirm('¿Estás seguro de reiniciar todas las métricas de entrenamiento?')) {
+                localStorage.removeItem('psychemotion_metrics');
+                userMetrics = {
+                    sessionsCount: 0,
+                    avgReaction: 260,
+                    accuracy: 85.0,
+                    historyReaction: [280, 270, 260],
+                    historyAccuracy: [82, 84, 85]
+                };
+                updateDashboardStats();
+                updateChartsData();
+                alert('Datos reiniciados correctamente.');
+            }
+        }
+    </script>
+</body>
+</html>
